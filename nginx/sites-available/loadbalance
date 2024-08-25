@@ -1,0 +1,48 @@
+
+    upstream wordpress {
+        server 192.168.140.52:80 weight=2;
+	server 192.168.140.51:80 weight=1;
+    }
+
+
+    upstream django {
+	server 192.168.140.51:8080 weight=2;
+	server 192.168.140.52:8080 weight=1;
+    }
+
+
+   server {
+       listen 80;
+       
+
+	server_name bwp.rohith.local;
+
+
+
+	location / {
+            proxy_pass http://wordpress;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+   }
+#
+    server {
+        listen 80;
+        server_name bdj.rohith.local;
+
+	location /static {
+      	 alias /var/www/static;
+    	}
+    	location /static/admin {
+      	 alias /var/www/static/admin;
+    	}
+
+
+
+        location / {
+            proxy_pass http://django;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
+
